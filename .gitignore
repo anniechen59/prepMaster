@@ -1,0 +1,12 @@
+.env
+__pycache__/
+
+temp_data/*
+!temp_data/.gitkeep
+
+data/audio/*
+*.wav
+*.mp3
+*.json
+*.png
+*.pdf
