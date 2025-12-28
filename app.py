@@ -34,14 +34,49 @@ st.set_page_config(page_title="PrepMaster AI - Auto Studio", layout="wide")
 
 st.markdown("""
 <style>
-.stImage > img { max-height: 500px; object-fit: contain; border-radius: 10px; border: 1px solid #ddd; }
-.stMetric { background-color: #f8f9fb; padding: 15px; border-radius: 10px; }
-.report-container { background-color: #fdfdfd; padding: 25px; border-radius: 15px;
-                    border-left: 10px solid #FF4B4B; border: 1px solid #eee; margin-top: 20px; }
-.ignore-btn { color: #ff4b4b; cursor: pointer; border: 1px solid #ff4b4b;
-              padding: 2px 5px; border-radius: 5px; font-size: 0.8em; }
+
+.stImage > img { 
+    max-height: 500px; 
+    object-fit: contain; 
+    border-radius: 10px; 
+    border: 1px solid #ddd; 
+}
+
+.stMetric { 
+    background-color: #f8f9fb; 
+    padding: 15px; 
+    border-radius: 10px; 
+}
+
+.report-container { 
+    background-color: #fdfdfd; 
+    padding: 25px; 
+    border-radius: 15px;
+    border-left: 10px solid #FF4B4B; 
+    border: 1px solid #eee; 
+    margin-top: 20px; 
+}
+
+.ignore-btn { 
+    color: #ff4b4b; 
+    cursor: pointer; 
+    border: 1px solid #ff4b4b;
+    padding: 2px 5px; 
+    border-radius: 5px; 
+    font-size: 0.8em; 
+}
+
+.user-email {
+    font-size: 0.9em;
+    color: #555;
+    margin-bottom: -2px;
+}
+
+
+
 </style>
 """, unsafe_allow_html=True)
+
 
 TEMP_DIR = "temp_data"
 os.makedirs(TEMP_DIR, exist_ok=True)
@@ -66,7 +101,8 @@ defaults = {
     "pdf_images": [],
     "ignored_keywords": set(),
     "user": None,
-    "project_id": "default"
+    "project_id": "default",
+    "analysis_done": False
 }
 for k, v in defaults.items():
     if k not in st.session_state:
@@ -108,6 +144,34 @@ if not st.session_state.user:
 # Sidebar Navigation
 st.sidebar.title("Navigation")
 page = st.sidebar.radio("Go to", ["Studio", "History"])
+
+with st.sidebar:
+    if st.session_state.user:
+
+        # 顯示使用者 email
+        st.markdown(
+            f"<div class='user-email'>👤 {st.session_state.user['email']}</div>",
+            unsafe_allow_html=True
+        )
+
+        st.markdown('<div class="logout-btn">', unsafe_allow_html=True)
+
+        if st.button("Logout", key="logout_sidebar"):
+            files_to_clean = [
+                PATH_AUDIO_WAV, PATH_FINAL_REPORT, PATH_FEEDBACK_MD,
+                PATH_WHISPER_OUT, PATH_TIMING
+            ]
+            for f in files_to_clean:
+                if os.path.exists(f):
+                    os.remove(f)
+
+            for key in list(st.session_state.keys()):
+                del st.session_state[key]
+
+            st.rerun()
+
+        st.markdown('</div>', unsafe_allow_html=True)
+
 
 # Auto Stage 1
 def run_auto_analysis_stage_1(audio_file):
@@ -164,6 +228,7 @@ def run_auto_analysis_stage_1(audio_file):
         if os.path.exists(PATH_FEEDBACK_MD):
             os.remove(PATH_FEEDBACK_MD)
 
+        st.session_state.analysis_done = True
         st.session_state.practice_started = False
         status.update(label="Analysis Complete!", state="complete")
 
@@ -200,6 +265,13 @@ if page == "Studio":
                     st.rerun()
             else:
                 st.success("🔴 Session Live")
+                
+                if st.button("🔄 Restart (Reset to Slide 1)", type="secondary", width="stretch"):
+                    st.session_state.practice_started = False
+                    st.session_state.page_index = 0 # 放回第一頁
+                    st.session_state.slide_timestamps = []
+                    st.rerun()
+
                 audio_data = st.audio_input("Record your presentation")
                 if audio_data:
                     run_auto_analysis_stage_1(audio_data)
@@ -229,7 +301,7 @@ if page == "Studio":
                 st.rerun()
 
         # Review Section 
-        if os.path.exists(PATH_FINAL_REPORT) and not st.session_state.practice_started:
+        if st.session_state.analysis_done and os.path.exists(PATH_FINAL_REPORT) and not st.session_state.practice_started:
             st.divider()
             st.subheader("🧐 1. Review & Calibrate Keywords")
             st.caption(
@@ -382,10 +454,33 @@ if page == "Studio":
 
                 st.write("")  # spacing
 
-                c_bot1, c_bot2 = st.columns([2, 1])
-                with c_bot2:
-                    if st.button("🔄 Update & Regenerate", width="stretch"):
-                        os.remove(PATH_FEEDBACK_MD)
+                st.subheader("🏁 Finish & Next Steps")
+                c_finish1, c_finish2, c_finish3 = st.columns([1, 1, 1])
+                
+                with c_finish1:
+                    if st.button("🔄 Practice Again", use_container_width=True, type="primary", help="針對同一份 PDF 重新練習並歸零"):
+                        # 清理本地檔案，重置投影片至第一頁
+                        files_to_clean = [PATH_AUDIO_WAV, PATH_FINAL_REPORT, PATH_FEEDBACK_MD, PATH_WHISPER_OUT, PATH_TIMING]
+                        for f in files_to_clean:
+                            if os.path.exists(f): os.remove(f)
+                        
+                        st.session_state.page_index = 0  # 歸零
+                        st.session_state.practice_started = False
+                        st.session_state.analysis_done = False
+                        st.session_state.slide_timestamps = []
+                        st.rerun()
+
+                with c_finish2:
+                    if st.button("📁 New Presentation", use_container_width=True, help="更換另一份 PDF 簡報"):
+                        # 徹底重設 session
+                        for key in list(st.session_state.keys()):
+                            if key not in ["user"]: del st.session_state[key]
+                        st.rerun()
+
+                with c_finish3:
+                    if st.button("🔄 Update Feedback", use_container_width=True, help="保留目前錄音，僅重新產生報告"):
+                        if os.path.exists(PATH_FEEDBACK_MD):
+                            os.remove(PATH_FEEDBACK_MD)
                         st.rerun()
 
 
