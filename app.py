@@ -268,7 +268,7 @@ if page == "Studio":
                 
                 if st.button("🔄 Restart (Reset to Slide 1)", type="secondary", width="stretch"):
                     st.session_state.practice_started = False
-                    st.session_state.page_index = 0 # 放回第一頁
+                    st.session_state.page_index = 0 
                     st.session_state.slide_timestamps = []
                     st.rerun()
 
@@ -458,27 +458,25 @@ if page == "Studio":
                 c_finish1, c_finish2, c_finish3 = st.columns([1, 1, 1])
                 
                 with c_finish1:
-                    if st.button("🔄 Practice Again", use_container_width=True, type="primary", help="針對同一份 PDF 重新練習並歸零"):
-                        # 清理本地檔案，重置投影片至第一頁
+                    if st.button("🔄 Practice Again", use_container_width=True, type="primary", help="Restart practice with the current slides. All current progress and analysis will be reset"):
                         files_to_clean = [PATH_AUDIO_WAV, PATH_FINAL_REPORT, PATH_FEEDBACK_MD, PATH_WHISPER_OUT, PATH_TIMING]
                         for f in files_to_clean:
                             if os.path.exists(f): os.remove(f)
                         
-                        st.session_state.page_index = 0  # 歸零
+                        st.session_state.page_index = 0  
                         st.session_state.practice_started = False
                         st.session_state.analysis_done = False
                         st.session_state.slide_timestamps = []
                         st.rerun()
 
                 with c_finish2:
-                    if st.button("📁 New Presentation", use_container_width=True, help="更換另一份 PDF 簡報"):
-                        # 徹底重設 session
+                    if st.button("📁 New Presentation", use_container_width=True, help="Upload a new PDF to start a different presentation project."):
                         for key in list(st.session_state.keys()):
                             if key not in ["user"]: del st.session_state[key]
                         st.rerun()
 
                 with c_finish3:
-                    if st.button("🔄 Update Feedback", use_container_width=True, help="保留目前錄音，僅重新產生報告"):
+                    if st.button("🔄 Update Feedback", use_container_width=True, help="Keep the existing audio and re-run the AI analysis (e.g., after updating ignored keywords)."):
                         if os.path.exists(PATH_FEEDBACK_MD):
                             os.remove(PATH_FEEDBACK_MD)
                         st.rerun()
@@ -516,7 +514,7 @@ if page == "History":
                 expiration=timedelta(hours=1),
                 method="GET"
             )
-            st.image(slide_url, caption="Slide Preview", use_container_width=280 )
+            st.image(slide_url, caption="Slide Preview", use_container_width=150 )
 
 
 

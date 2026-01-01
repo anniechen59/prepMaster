@@ -1,13 +1,29 @@
 
-# PrepMaster AI
+# PrepMaster AI: Intelligent Presentation Coaching System
 
-PrepMaster AI is an intelligent presentation coaching system designed to help users refine their public speaking skills. By performing multi-modal analysis on speech audio, slide content, and presentation timing, the system provides a comprehensive, objective evaluation of presentation performance.
+**A verifiable evaluation engine that bridges the gap between slide content and spoken delivery through multi-modal analysis.**
 
-## Core Objective
+## The Challenge: Beyond the "Black-Box"
+Most AI coaching tools suffer from **"Black-Box Evaluation"** and **"Keyword Rigidity"**. If a speaker uses a synonym instead of the exact word on a slide, traditional systems fail to recognize the content. Furthermore, speakers often struggle to objectively self-assess their pacing and engagement.
 
-Speakers often struggle to objectively self-assess their presentations—whether key points were covered, the pace was appropriate, or the tone was engaging. PrepMaster AI addresses this challenge by leveraging ASR (Automatic Speech Recognition) and NLP (Natural Language Processing) technologies to deliver quantitative analysis reports, making practice sessions more efficient and targeted.
+**PrepMaster AI** was engineered to solve these challenges by leveraging ASR (Automatic Speech Recognition) and NLP technologies to deliver **quantitative, traceable, and objective** feedback.
 
----
+## The Solution: Multi-Modal Analysis
+PrepMaster AI goes beyond simple transcription. It performs a synchronized analysis of **speech audio, slide content, and presentation timing** to transform a non-structured rehearsal into a data-driven report.
+
+### Key Innovations:
+* **Transparent Evaluation:** Replaces vague AI guesses with a 3:4:3 weighted scoring model (Content, Fluency, Tone).
+* **Intelligent Alignment:** Uses a hierarchical validation pipeline to ensure that what you *mean* is just as important as what you *say*.
+* **Actionable Metrics:** Delivers measurable insights into speaking tempo (WPM), filler-word density, and key point coverage to make practice sessions targeted and efficient.
+
+## Project Demonstration
+
+<div>
+  <a href="https://www.youtube.com/watch?v=aFXT7-qVwXc">
+    <img src="https://img.youtube.com/vi/aFXT7-qVwXc/maxresdefault.jpg" alt="PrepMaster AI Demo" style="width:60%;">
+  </a>
+  <p><i>Click to watch the full walkthrough on YouTube</i></p>
+</div>
 
 ## Technical Architecture & Three-Layer Validation
 
